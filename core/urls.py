@@ -2,12 +2,24 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from dashboard.views import dashboard_view, public_home_view
+from dashboard.views import (
+    public_home_view, record_detail_view,
+    dashboard_list_view, record_create_view,
+    record_edit_view, record_delete_view
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', public_home_view, name='home'),          # Public end-user frontend
-    path('manage/', dashboard_view, name='dashboard'), # Admin data-entry dashboard
+    
+    # Public Frontend Routes
+    path('', public_home_view, name='home'),
+    path('item/<int:pk>/', record_detail_view, name='record_detail'),
+    
+    # Secure Management & CRUD Routes
+    path('manage/', dashboard_list_view, name='dashboard'),
+    path('manage/add/', record_create_view, name='record_add'),
+    path('manage/<int:pk>/edit/', record_edit_view, name='record_edit'),
+    path('manage/<int:pk>/delete/', record_delete_view, name='record_delete'),
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-light">Content Management Dashboard</h2>
+        <a href="{% url 'record_add' %}" class="btn btn-success">+ Add New Item</a>
+    </div>
+
+    <div class="col-12">
+        <div class="card bg-dark border-secondary p-4 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Image</th>
+                            <th>Title</th>
+                            <th>Date Added</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                {% if record.image %}
+                                    <img src="{{ record.image.url }}" class="img-thumbnail bg-secondary border-0" style="width: 45px; height: 45px; object-fit: cover;">
+                                {% else %}
+                                    <span class="text-muted small">None</span>
+                                {% endif %}
+                            </td>
+                            <td class="fw-bold text-info">{{ record.title }}</td>
+                            <td>{{ record.created_at|date:"M d, Y H:i" }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'record_detail' record.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                <a href="{% url 'record_edit' record.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a href="{% url 'record_delete' record.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No content items found. Click "+ Add New Item" to start.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
