@@ -1,8 +1,14 @@
 from django.contrib import admin
 from django.urls import path
-from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
+from dashboard.views import dashboard_view, public_home_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='dashboard/index.html'), name='home'),
+    path('', public_home_view, name='home'),          # Public end-user frontend
+    path('manage/', dashboard_view, name='dashboard'), # Admin data-entry dashboard
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

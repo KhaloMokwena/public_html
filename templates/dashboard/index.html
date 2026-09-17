@@ -1,12 +1,60 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 text-center mt-5">
-        <h1 class="display-5 fw-bold text-success">Architecture Deployed successfully</h1>
-        <p class="lead mt-3">Bootstrap 5 is active. Docker is running. Ready for development.</p>
-        <hr class="my-4">
-        <p>Next step: define your database models or build your first form.</p>
+<div class="row mt-4">
+    <!-- Left Column: Form -->
+    <div class="col-md-4">
+        <div class="card bg-dark border-secondary p-4 shadow-sm">
+            <h3 class="text-light mb-3">Add New Record</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- CHANGED FROM {{ form|crispy }} TO {% crispy form %} -->
+                {% crispy form %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Data Table -->
+    <div class="col-md-8">
+        <div class="card bg-dark border-secondary p-4 shadow-sm">
+            <h3 class="text-light mb-3">Saved Records</h3>
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Image</th>
+                            <th>Title & Description</th>
+                            <th>Date Added</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                {% if record.image %}
+                                    <img src="{{ record.image.url }}" alt="{{ record.title }}" class="img-thumbnail bg-secondary border-0" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <span class="text-muted small">No image</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ record.title }}</div>
+                                <div class="text-muted small">{{ record.description }}</div>
+                            </td>
+                            <td>{{ record.created_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No records found. Use the form to add one!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
