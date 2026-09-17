@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Services | ZuriKO{% endblock %}
+{% block nav_services %}active-node{% endblock %}
+{% block nav_services_icon %}={% endblock %}
+
+{% block content %}
+<style>
+    .services-container {
+        position: relative;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 2rem 0;
+        z-index: 2;
+    }
+    
+    .service-row {
+        position: relative;
+        padding: 2.5rem 0;
+        border-bottom: 1px solid var(--glass-border);
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        align-items: center;
+    }
+    
+    .service-num {
+        font-family: monospace;
+        font-size: 1.5rem;
+        color: var(--tech-brand);
+        margin-right: 3rem;
+        transition: all 0.4s;
+    }
+    
+    .service-title {
+        font-size: 4rem;
+        font-weight: 900;
+        letter-spacing: -2px;
+        color: rgba(255, 255, 255, 0.3);
+        transition: all 0.4s;
+        text-transform: uppercase;
+        margin: 0;
+        line-height: 1;
+    }
+
+    /* Hover Interactions */
+    .services-wrapper:hover .service-title { color: rgba(255,255,255,0.05); } /* Dim others */
+    
+    .service-row:hover { padding-left: 3rem; }
+    .service-row:hover .service-num { font-size: 2.5rem; color: #fff; text-shadow: 0 0 15px var(--tech-brand); }
+    .service-row:hover .service-title { color: #fff; letter-spacing: 2px; }
+    
+    .view-indicator {
+        position: absolute; right: 0; opacity: 0;
+        color: var(--tech-brand); font-family: monospace;
+        transition: all 0.4s; transform: translateX(-20px);
+    }
+    .service-row:hover .view-indicator { opacity: 1; transform: translateX(0); }
+
+    /* The Slide-Up Modal */
+    .service-modal {
+        position: fixed; top: 100%; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(15px);
+        z-index: 10000;
+        transition: top 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+        display: flex; flex-direction: column;
+        padding: 4rem 10%;
+    }
+    .service-modal.active { top: 0; }
+    
+    .modal-close {
+        align-self: flex-end;
+        color: #ff003c;
+        font-family: monospace;
+        cursor: pointer;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+    .modal-close:hover { text-shadow: 0 0 10px #ff003c; }
+</style>
+
+<div class="container services-wrapper">
+    <div class="tech-label mb-4">/ INITIATING SERVICE MATRICES</div>
+    
+    <div class="services-container">
+        {% for service in services %}
+        <!-- Dynamic row for each service -->
+        <div class="service-row" onclick="openModal('modal-{{ service.id }}')">
+            <div class="service-num">0{{ forloop.counter }}</div>
+            <h2 class="service-title">{{ service.category }}</h2>
+            <div class="view-indicator">[ VIEW PROTOCOL &rarr; ]</div>
+        </div>
+
+        <!-- Hidden Modal specific to this service -->
+        <div class="service-modal" id="modal-{{ service.id }}">
+            <div class="modal-close" onclick="closeModal('modal-{{ service.id }}', event)">[ CLOSE &times; ]</div>
+            <div class="tech-label mt-4">/ PROTOCOL {{ forloop.counter }}</div>
+            <h1 class="display-1 fw-bold text-white mb-4" style="letter-spacing: -3px;">{{ service.title|upper }}</h1>
+            <div style="width: 100%; height: 1px; background: var(--brand-gradient); margin-bottom: 3rem;"></div>
+            
+            <div class="row">
+                <div class="col-lg-8 fs-4" style="color: #a0a0a0; font-weight: 300;">
+                    {{ service.description|linebreaksbr }}
+                </div>
+            </div>
+            
+            <div class="mt-auto pb-5">
+                <a href="{% url 'contact' %}" class="btn text-info" style="border: 1px solid var(--tech-brand); border-radius: 0;">
+                    [ INITIATE SECURE COMMS ]
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="tech-label">NO ACTIVE SERVICES IN DATABASE.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+        document.body.style.overflow = 'hidden'; // Stop background scrolling
+    }
+    function closeModal(id, event) {
+        event.stopPropagation();
+        document.getElementById(id).classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+</script>
+{% endblock %}

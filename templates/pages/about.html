@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}About | ZuriKO Technologies{% endblock %}
+{% block nav_about %}active-node{% endblock %}
+{% block nav_about_icon %}={% endblock %}
+
+{% block content %}
+<style>
+    /* OVERSIZED TYPOGRAPHY */
+    .hero-title {
+        font-size: clamp(4rem, 8vw, 8rem);
+        font-weight: 900;
+        line-height: 0.85;
+        letter-spacing: -3px;
+        background: var(--brand-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0;
+    }
+
+    .tech-label {
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: var(--tech-brand);
+        letter-spacing: 2px;
+    }
+
+    /* ASYMMETRIC GRID CANVAS */
+    .asymmetric-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 80vh;
+        align-items: center;
+        gap: 4rem;
+        padding: 4rem 0;
+    }
+    @media (max-width: 991px) {
+        .asymmetric-grid { grid-template-columns: 1fr; }
+    }
+    
+    /* 3D FLOATING VECTOR SYSTEM */
+    .floating-visual {
+        width: 100%;
+        height: 480px;
+        border: 1px solid var(--glass-border);
+        background: radial-gradient(circle at center, rgba(0,240,255,0.08) 0%, transparent 70%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.15s ease-out;
+    }
+    .floating-visual::before {
+        content: '';
+        position: absolute;
+        width: 220px; height: 220px;
+        border: 2px solid #5d00ff;
+        border-radius: 50%;
+        animation: rotateMesh 12s linear infinite;
+    }
+    .floating-visual::after {
+        content: '';
+        position: absolute;
+        width: 160px; height: 160px;
+        border: 1px dashed #ff003c;
+        border-radius: 50%;
+        animation: rotateMesh 8s linear infinite reverse;
+    }
+    @keyframes rotateMesh { 100% { transform: rotate(360deg); } }
+
+    /* TERMINAL EXPANSION */
+    .terminal-panel {
+        border: 1px solid var(--glass-border);
+        background: rgba(10, 10, 14, 0.7);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        margin-top: 2rem;
+        font-family: monospace;
+        color: #a0a0a0;
+        height: 65px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s;
+    }
+    .terminal-panel:hover { border-color: var(--tech-brand); }
+    .terminal-panel.expanded { height: 380px; cursor: default; overflow-y: auto; }
+    
+    .terminal-header {
+        display: flex; justify-content: space-between; align-items: center;
+        color: var(--tech-brand);
+        font-weight: bold;
+    }
+
+    /* DYNAMIC FAQ ACCORDION */
+    .tech-accordion .accordion-item {
+        background: rgba(10, 10, 12, 0.6);
+        border: 1px solid var(--glass-border);
+        margin-bottom: 1rem;
+    }
+    .tech-accordion .accordion-button {
+        background: transparent;
+        color: #fff;
+        font-family: monospace;
+        box-shadow: none;
+    }
+    .tech-accordion .accordion-button:not(.collapsed) {
+        color: var(--tech-brand);
+        border-bottom: 1px solid var(--glass-border);
+    }
+    .tech-accordion .accordion-body {
+        color: #a0a0a0;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="asymmetric-grid" id="parallax-container">
+        
+        <!-- Left Column: Interactive 3D Visual -->
+        <div>
+            <div class="tech-label mb-2">/ 02 SYSTEM.CORE</div>
+            <div class="floating-visual" id="3d-object">
+                <div class="text-center">
+                    <div class="tech-label">[ ARCHITECTURE: HYBRID ]</div>
+                    <div class="small text-muted mt-1">ACID COMPLIANT</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Content & Typography -->
+        <div>
+            <h1 class="hero-title">ABOUT</h1>
+            <h1 class="hero-title" style="color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.2); -webkit-text-fill-color: transparent; background: none;">ZURIKO</h1>
+            
+            <p class="mt-4 fs-5" style="color: #888; max-width: 520px;">
+                ZuriKO Technologies operates as a premier multi-disciplinary enterprise modernization and brand transformation collective based in Centurion, South Africa.
+            </p>
+
+            <!-- Terminal Expansion Block -->
+            <div class="terminal-panel" id="terminal" onclick="expandTerminal()">
+                <div class="terminal-header" id="term-header">
+                    <span>READ CORPORATE CAPABILITIES PROFILE &rarr;</span>
+                    <span class="d-none" id="term-close" onclick="closeTerminal(event)" style="cursor: pointer;">[ CLOSE &times; ]</span>
+                </div>
+                
+                <div class="terminal-content mt-4">
+                    <p><strong class="text-white">Enterprise Software Engineering & Architecture</strong></p>
+                    <p>We build large-scale corporate web backends and microservices frameworks utilizing Java with Spring Boot and modern C# within the .NET Core runtime environment.</p>
+                    <p>Our engineering philosophy is strictly production-first, focusing intensely on thread safety, query execution optimizations, and absolute ACID transactional compliance.</p>
+                    <div class="tech-label mt-3">> _ POPIA COMPLIANCE SAFeguards ACTIVE.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic FAQ Accordion Section -->
+    <div class="row mt-5 pt-5 border-top border-secondary">
+        <div class="col-12 mb-4">
+            <div class="tech-label">/ ARCHITECTURAL FAQ</div>
+            <h2 class="fw-bold text-white">Frequently Asked Technical Operations</h2>
+        </div>
+        <div class="col-lg-10 mx-auto">
+            <div class="accordion tech-accordion" id="faqAccordion">
+                {% for faq in faqs %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-{{ faq.id }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ faq.id }}">
+                            #0{{ forloop.counter }} &nbsp; {{ faq.question }}
+                        </button>
+                    </h2>
+                    <div id="collapse-{{ faq.id }}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            {{ faq.answer|linebreaksbr }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="tech-label py-3">NO FAQS DETECTED IN DATABASE.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Parallax mouse effect for 3D visual container
+    const container = document.getElementById('parallax-container');
+    const obj = document.getElementById('3d-object');
+
+    container.addEventListener('mousemove', (e) => {
+        let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+        let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+        obj.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+    });
+    container.addEventListener('mouseleave', () => {
+        obj.style.transform = `rotateY(0deg) rotateX(0deg)`;
+    });
+
+    // Terminal Expansion Control
+    const term = document.getElementById('terminal');
+    const header = document.getElementById('term-header');
+    const closeBtn = document.getElementById('term-close');
+
+    function expandTerminal() {
+        if(!term.classList.contains('expanded')) {
+            term.classList.add('expanded');
+            header.children[0].innerText = "DIVISION 01 • OPERATIONAL CORE PROFILE";
+            closeBtn.classList.remove('d-none');
+        }
+    }
+    
+    function closeTerminal(e) {
+        e.stopPropagation();
+        term.classList.remove('expanded');
+        setTimeout(() => {
+            header.children[0].innerHTML = "READ CORPORATE CAPABILITIES PROFILE &rarr;";
+            closeBtn.classList.add('d-none');
+        }, 300);
+    }
+</script>
+{% endblock %}

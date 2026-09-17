@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact | ZuriKO{% endblock %}
+{% block nav_contact %}active-node{% endblock %}
+{% block nav_contact_icon %}={% endblock %}
+
+{% block content %}
+<style>
+    /* Glowing Line Builder Form */
+    .terminal-input-group {
+        margin-bottom: 4rem;
+        position: relative;
+    }
+    
+    .terminal-label {
+        font-family: monospace;
+        color: var(--tech-brand);
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        display: block;
+        margin-bottom: 0.5rem;
+        transition: transform 0.3s, color 0.3s;
+    }
+    
+    .terminal-input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 2rem;
+        padding: 0.5rem 0;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+    
+    .terminal-input:focus { border-bottom-color: transparent; }
+    
+    /* The animated glowing line under inputs */
+    .input-line {
+        position: absolute; bottom: 0; left: 0;
+        width: 100%; height: 2px;
+        background: var(--brand-gradient);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+    .terminal-input:focus ~ .input-line { transform: scaleX(1); }
+    .terminal-input:focus ~ .terminal-label { transform: translateY(-10px); color: #fff; }
+
+    /* Submit Button Animation */
+    .btn-transmit {
+        background: transparent;
+        color: #fff;
+        font-family: monospace;
+        font-size: 1.5rem;
+        border: none;
+        letter-spacing: 4px;
+        position: relative;
+        overflow: hidden;
+        padding: 1rem 3rem;
+        cursor: pointer;
+    }
+    .btn-transmit::before {
+        content: ''; position: absolute; top: 0; left: -100%;
+        width: 100%; height: 1px; background: var(--brand-gradient);
+        transition: left 0.4s;
+    }
+    .btn-transmit::after {
+        content: ''; position: absolute; bottom: 0; right: -100%;
+        width: 100%; height: 1px; background: var(--brand-gradient);
+        transition: right 0.4s;
+    }
+    .btn-transmit:hover::before { left: 0; }
+    .btn-transmit:hover::after { right: 0; }
+    
+    /* Confirmation State */
+    .success-state {
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.5s;
+    }
+    .success-state.active { opacity: 1; pointer-events: all; }
+</style>
+
+<div class="container py-5" style="position: relative; min-height: 80vh;">
+    <div class="row">
+        <div class="col-lg-8 mx-auto" id="contact-wrapper">
+            
+            <div class="tech-label mb-5">/ ESTABLISHING SECURE CONNECTION</div>
+            
+            <form id="tech-contact-form" onsubmit="transmitMessage(event)">
+                <!-- CSRF is still needed if you process this via Django later -->
+                {% csrf_token %}
+                
+                <div class="terminal-input-group">
+                    <label class="terminal-label">YOUR DESIGNATION [NAME]</label>
+                    <input type="text" class="terminal-input" required>
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="terminal-input-group">
+                    <label class="terminal-label">SECURE ROUTING [EMAIL]</label>
+                    <input type="email" class="terminal-input" required>
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="terminal-input-group">
+                    <label class="terminal-label">DATA PAYLOAD [MESSAGE]</label>
+                    <textarea class="terminal-input" rows="2" style="resize: none;" required></textarea>
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="text-end mt-5">
+                    <button type="submit" class="btn-transmit">[ TRANSMIT DATA &rarr; ]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden Success Animation -->
+    <div class="success-state" id="success-state">
+        <h1 class="display-1" style="color: var(--tech-brand);">&#10003;</h1>
+        <h2 class="fw-bold text-white letter-spacing-1">DATA TRANSMITTED</h2>
+        <div class="tech-label mt-3">CONNECTION TERMINATED.</div>
+        <div style="width: 200px; height: 1px; background: var(--brand-gradient); margin-top: 2rem;"></div>
+    </div>
+</div>
+
+<script>
+    function transmitMessage(e) {
+        e.preventDefault(); // Prevent page reload for effect
+        const btn = document.querySelector('.btn-transmit');
+        
+        // Stage 1: Loading
+        btn.innerHTML = '[ ENCRYPTING... ]';
+        btn.style.color = 'var(--tech-brand)';
+        
+        // Stage 2 & 3: Fade out form and fade in success
+        setTimeout(() => {
+            document.getElementById('contact-wrapper').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('success-state').classList.add('active');
+            }, 500);
+        }, 1500);
+    }
+</script>
+{% endblock %}
