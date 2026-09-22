@@ -1,16 +1,15 @@
 {% extends 'manage/manage_base.html' %}
 
 {% block manage_content %}
-<div class="row justify-content-center mt-5">
+<div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card bg-dark text-light border-secondary p-4 shadow-sm">
             <h3 class="text-danger mb-3">Delete Confirmation</h3>
-            <p>Are you sure you want to delete <strong class="text-info">"{{ record.title }}"</strong>? It will disappear anywhere it is used (logo, backgrounds, banners, gallery, divisions). This cannot be undone.</p>
-            
+            <p>Are you sure you want to delete the {{ collection.label|lower }} <strong class="text-info">"{{ instance }}"</strong>? It will disappear from the {{ page.label }} page. This cannot be undone.</p>
             <form method="post" class="mt-4">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger w-100 mb-2">Confirm Delete</button>
-                <a href="{% url 'record_list' %}" class="btn btn-outline-secondary w-100">Cancel</a>
+                <a href="{% url 'page_edit' collection.page %}" class="btn btn-outline-secondary w-100">Cancel</a>
             </form>
         </div>
     </div>

@@ -114,3 +114,33 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# ---------------------------------------------------------------------------
+# Static files (the site's stylesheet lives in dashboard/static/dashboard/css/site.css)
+# ---------------------------------------------------------------------------
+# `python manage.py collectstatic` gathers every app's static files here for production hosting.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# ---------------------------------------------------------------------------
+# Private uploads: candidate CVs. Kept OUTSIDE media/ so they can never be opened by URL;
+# only staff can download them, from /manage/applications/.
+# ---------------------------------------------------------------------------
+PRIVATE_MEDIA_ROOT = BASE_DIR / 'private_uploads'
+
+
+# ---------------------------------------------------------------------------
+# Email: new job applications and contact enquiries are emailed (as the old PHP handlers did).
+# By default emails are printed to the server log, which is what you want while developing.
+# For real delivery set these environment variables (e.g. in docker-compose.yml or your host's panel):
+#   EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+#   EMAIL_HOST=mail.yourdomain.co.za   EMAIL_PORT=587   EMAIL_USE_TLS=True
+#   EMAIL_HOST_USER=info@yourdomain.co.za   EMAIL_HOST_PASSWORD=...
+# ---------------------------------------------------------------------------
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '25'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False') == 'True'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'ZuriKO Website <info@zuriko.co.za>')

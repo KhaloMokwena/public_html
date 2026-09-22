@@ -1,0 +1,36 @@
+{% extends 'manage/manage_base.html' %}
+
+{% block manage_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="text-light mb-0">Messages</h2>
+    <span class="text-secondary small">Enquiries sent through the Contact page, newest first.</span>
+</div>
+
+{% for m in enquiries %}
+<div class="card bg-dark border-secondary p-4 shadow-sm mb-3 {% if not m.handled %}border-info{% endif %}">
+    <div class="d-flex flex-wrap justify-content-between gap-2">
+        <div>
+            <h5 class="text-light mb-1">{{ m.name }}
+                {% if not m.handled %}<span class="badge text-bg-info ms-2">New</span>{% endif %}
+            </h5>
+            <div class="small">
+                <a href="mailto:{{ m.email }}" class="text-info text-decoration-none">{{ m.email }}</a>
+                {% if m.phone %}<span class="text-secondary"> &middot; </span><a href="tel:{{ m.phone|cut:' ' }}" class="text-info text-decoration-none">{{ m.phone }}</a>{% endif %}
+            </div>
+        </div>
+        <div class="text-secondary small text-md-end">{{ m.created_at|date:"D d M Y, H:i" }}</div>
+    </div>
+    <p class="text-light mt-3 mb-3" style="white-space: pre-wrap;">{{ m.message }}</p>
+    <div class="d-flex gap-2">
+        <form method="post" action="{% url 'inbox_toggle' m.pk %}">{% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-{% if m.handled %}secondary{% else %}success{% endif %}">{% if m.handled %}Mark as new{% else %}Mark as handled{% endif %}</button>
+        </form>
+        <form method="post" action="{% url 'inbox_delete' m.pk %}" onsubmit="return confirm('Delete this enquiry permanently?');">{% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+    </div>
+</div>
+{% empty %}
+<div class="card bg-dark border-secondary p-4"><p class="text-secondary mb-0">No enquiries yet. They will appear here when someone uses the Contact page form.</p></div>
+{% endfor %}
+{% endblock %}

@@ -1,20 +1,257 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+{% load static content_tags %}<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Platform Setup</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}ZuriKO Technologies{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'dashboard/css/site.css' %}">
+    <script>
+        /* Set the theme before the page paints, so there is no flash of the wrong colours. */
+        (function () {
+            var saved = null;
+            try { saved = localStorage.getItem('zuriko-theme'); } catch (e) {}
+            var theme = saved === 'light' || saved === 'dark' ? saved : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
+    {% block extra_head %}{% endblock %}
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom mb-4">
+<body class="{% block body_class %}{% endblock %}">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="site-head{% if request.resolver_match.url_name == 'home' %} over-hero{% endif %}">
+    <div class="topbar">
+        <div class="container topbar__in">
+            {% page_text 'site' 'email' as site_email %}
+            {% page_text 'site' 'phone' as site_phone %}
+            <div class="topbar__contact">
+                <a href="mailto:{{ site_email }}">{{ site_email }}</a>
+                <a href="tel:{{ site_phone|cut:' ' }}">{{ site_phone }}</a>
+            </div>
+            <a class="btn-cta" href="{% url 'contact' %}">{% page_text 'site' 'cta_label' %}</a>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg site-nav" aria-label="Main">
         <div class="container">
-            <a class="navbar-brand" href="/">⚙️ cPanel Django Stack</a>
+            <a class="navbar-brand" href="{% url 'home' %}">
+                {% page_media 'site' 'logo' as logo_url %}
+                {% if logo_url %}
+                    <img class="brand-logo" src="{{ logo_url }}" alt="{% page_text 'site' 'logo_alt' %}">
+                {% else %}
+                    <span class="brand-word">{% page_text 'site' 'brand_name' %}</span>
+                {% endif %}
+            </a>
+
+            <div class="nav-tools d-lg-none">
+                <button class="nav-btn" type="button" id="open-search" aria-label="Search the site">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto ms-lg-3">
+                    <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}" href="{% url 'home' %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %}>{% page_text 'site' 'nav_home' %}</a></li>
+                    <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'about' %} active{% endif %}" href="{% url 'about' %}"{% if request.resolver_match.url_name == 'about' %} aria-current="page"{% endif %}>{% page_text 'site' 'nav_about' %}</a></li>
+                    <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'services' %} active{% endif %}" href="{% url 'services' %}"{% if request.resolver_match.url_name == 'services' %} aria-current="page"{% endif %}>{% page_text 'site' 'nav_services' %}</a></li>
+                    <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'careers' %} active{% endif %}" href="{% url 'careers' %}"{% if request.resolver_match.url_name == 'careers' %} aria-current="page"{% endif %}>{% page_text 'site' 'nav_careers' %}</a></li>
+                    <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'contact' %} active{% endif %}" href="{% url 'contact' %}"{% if request.resolver_match.url_name == 'contact' %} aria-current="page"{% endif %}>{% page_text 'site' 'nav_contact' %}</a></li>
+                </ul>
+
+                <form class="site-search" role="search" action="{% url 'search' %}" method="get" data-suggest-url="{% url 'search_suggest' %}">
+                    <label class="visually-hidden" for="site-q">Search the site</label>
+                    <input id="site-q" name="q" type="search" value="{{ q|default:'' }}" placeholder="{% page_text 'site' 'search_placeholder' %}"
+                           autocomplete="off" aria-autocomplete="list" aria-controls="site-suggest" aria-expanded="false">
+                    <button class="btn-search" type="submit" aria-label="Search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    </button>
+                    <ul id="site-suggest" class="suggest" role="listbox" hidden></ul>
+                </form>
+
+                <button class="nav-btn theme-toggle" type="button" id="theme-toggle" aria-label="Switch to light theme" aria-pressed="false">
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
+                </button>
+            </div>
         </div>
     </nav>
-    <main class="container">
-        {% block content %}{% endblock %}
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+<main id="main" class="{% block main_class %}container{% endblock %}">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-foot">
+    <div class="container foot-in">
+        <span>{% page_text 'site' 'copyright' %}</span>
+        <span>{% page_text 'site' 'credit' %}</span>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ---- Light / dark theme toggle ---- */
+(function () {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function apply(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+        btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+    }
+    apply(document.documentElement.getAttribute('data-theme') || 'dark');
+    btn.addEventListener('click', function () {
+        var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        apply(next);
+        try { localStorage.setItem('zuriko-theme', next); } catch (e) {}
+    });
+})();
+
+/* ---- If Bootstrap's script could not load (offline / CDN blocked), keep the menu and accordions working ---- */
+if (!window.bootstrap) {
+    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var target = document.querySelector(btn.getAttribute('data-bs-target'));
+            if (!target) return;
+            var open = target.classList.toggle('show');
+            btn.classList.toggle('collapsed', !open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    });
+}
+
+/* ---- Search box: live suggestions, keyboard navigation, mobile search button ---- */
+(function () {
+    var form = document.querySelector('.site-search');
+    if (!form) return;
+    var input = form.querySelector('input[name=q]');
+    var list = document.getElementById('site-suggest');
+    var endpoint = form.getAttribute('data-suggest-url');
+    var timer = null, seq = 0, items = [], idx = -1;
+
+    function close() {
+        list.hidden = true; list.innerHTML = ''; items = []; idx = -1;
+        input.setAttribute('aria-expanded', 'false');
+    }
+    function render(data) {
+        list.innerHTML = '';
+        if (!data.results.length) { close(); return; }
+        data.results.forEach(function (r) {
+            var li = document.createElement('li'), a = document.createElement('a'), s = document.createElement('small');
+            a.href = r.url; a.setAttribute('role', 'option'); a.textContent = r.title;
+            s.textContent = r.kind + ' \u00b7 ' + r.page;
+            a.appendChild(s); li.appendChild(a); list.appendChild(li);
+        });
+        if (data.total > data.results.length) {
+            var li = document.createElement('li'), a = document.createElement('a');
+            li.className = 'suggest-all'; a.href = data.all_url; a.textContent = 'See all ' + data.total + ' results';
+            li.appendChild(a); list.appendChild(li);
+        }
+        items = [].slice.call(list.querySelectorAll('a')); idx = -1;
+        list.hidden = false; input.setAttribute('aria-expanded', 'true');
+    }
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+        var q = input.value.trim();
+        if (q.length < 2) { close(); return; }
+        timer = setTimeout(function () {
+            var mine = ++seq;
+            fetch(endpoint + '?q=' + encodeURIComponent(q), { headers: { 'Accept': 'application/json' } })
+                .then(function (r) { return r.json(); })
+                .then(function (d) { if (mine === seq) render(d); })
+                .catch(close);
+        }, 180);
+    });
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { close(); return; }
+        if (list.hidden || !items.length) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); idx = (idx + 1) % items.length; }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); idx = (idx - 1 + items.length) % items.length; }
+        else if (e.key === 'Enter' && idx >= 0) { e.preventDefault(); items[idx].click(); return; }
+        else return;
+        items.forEach(function (a, i) { a.classList.toggle('is-active', i === idx); });
+        items[idx].scrollIntoView({ block: 'nearest' });
+    });
+    document.addEventListener('click', function (e) { if (!form.contains(e.target)) close(); });
+
+    var opener = document.getElementById('open-search');
+    if (opener) opener.addEventListener('click', function () {
+        var menu = document.getElementById('mainNav');
+        if (window.bootstrap) window.bootstrap.Collapse.getOrCreateInstance(menu, { toggle: false }).show();
+        else menu.classList.add('show');
+        setTimeout(function () { input.focus(); }, 250);
+    });
+})();
+
+/* ---- Arriving from a search result: highlight the match, open what is collapsed, scroll to it ---- */
+(function () {
+    var root = document.getElementById('main');
+    if (!root) return;
+
+    function openCollapse(c) {
+        c.classList.add('show');
+        if (c.id) {
+            var btn = document.querySelector('[data-bs-target="#' + c.id + '"]');
+            if (btn) { btn.classList.remove('collapsed'); btn.setAttribute('aria-expanded', 'true'); }
+        }
+    }
+    function reveal(el) {
+        for (var n = el; n && n !== document.body; n = n.parentElement) {
+            if (n.tagName === 'DETAILS') n.open = true;
+            if (n.classList && n.classList.contains('accordion-collapse')) openCollapse(n);
+        }
+        if (el.tagName === 'DETAILS') el.open = true;
+        var inner = el.querySelector ? el.querySelector('.accordion-collapse') : null;
+        if (inner) openCollapse(inner);
+    }
+
+    var hl = (new URLSearchParams(window.location.search).get('hl') || '').trim();
+    if (hl) {
+        var terms = hl.split(/\s+/).filter(Boolean).map(function (t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); });
+        if (terms.length) {
+            var test = new RegExp(terms.join('|'), 'i');
+            var splitter = new RegExp('(' + terms.join('|') + ')', 'i');
+            var skip = /^(SCRIPT|STYLE|NOSCRIPT|MARK|TEXTAREA|INPUT|BUTTON)$/;
+            var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                acceptNode: function (n) {
+                    var p = n.parentElement;
+                    if (!p || skip.test(p.tagName) || p.closest('.no-hl')) return NodeFilter.FILTER_REJECT;
+                    return test.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                }
+            });
+            var nodes = [], node;
+            while ((node = walker.nextNode()) && nodes.length < 300) nodes.push(node);
+            nodes.forEach(function (n) {
+                var parts = n.nodeValue.split(splitter), frag = document.createDocumentFragment();
+                parts.forEach(function (part, i) {
+                    if (!part) return;
+                    if (i % 2) { var m = document.createElement('mark'); m.className = 'hit'; m.textContent = part; frag.appendChild(m); }
+                    else frag.appendChild(document.createTextNode(part));
+                });
+                n.parentNode.replaceChild(frag, n);
+            });
+        }
+    }
+
+    var target = window.location.hash ? document.getElementById(decodeURIComponent(window.location.hash.slice(1))) : null;
+    var marks = [].slice.call(root.querySelectorAll('mark.hit'));
+    marks.forEach(reveal);
+    if (target) reveal(target);
+    var focusEl = target || marks[0];
+    if (focusEl) {
+        setTimeout(function () {
+            focusEl.scrollIntoView({ block: target ? 'start' : 'center', behavior: 'smooth' });
+            if (target) target.classList.add('flash');
+        }, 120);
+    }
+})();
+</script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

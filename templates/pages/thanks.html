@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Thank you | ZuriKO Technologies{% endblock %}
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<section class="thanks">
+    <div class="container">
+        <div class="thanks__card">
+            <div class="sent__mark" aria-hidden="true">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+            </div>
+            <h1 class="connect-h">{{ heading }}</h1>
+            <p class="lede mx-auto">{{ text }}</p>
+            <div class="thanks__actions">
+                <a class="btn-cta" href="{{ primary_url }}">{{ primary_label }}</a>
+                <a class="btn-ghost" href="{{ secondary_url }}">{{ secondary_label }}</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

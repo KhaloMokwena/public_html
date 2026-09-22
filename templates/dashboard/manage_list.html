@@ -1,53 +1,77 @@
-{% extends 'base.html' %}
+{% extends 'manage/manage_base.html' %}
 
-{% block content %}
-<div class="row mt-4">
-    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-light">Content Management Dashboard</h2>
-        <a href="{% url 'record_add' %}" class="btn btn-success">+ Add New Item</a>
-    </div>
+{% block manage_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="text-light mb-0">Media library</h2>
+    <a href="{% url 'record_add' %}" class="btn btn-success">+ Add media</a>
+</div>
 
-    <div class="col-12">
-        <div class="card bg-dark border-secondary p-4 shadow-sm">
-            <div class="table-responsive">
-                <table class="table table-dark table-striped table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Image</th>
-                            <th>Title</th>
-                            <th>Date Added</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in records %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>
-                                {% if record.image %}
-                                    <img src="{{ record.image.url }}" class="img-thumbnail bg-secondary border-0" style="width: 45px; height: 45px; object-fit: cover;">
-                                {% else %}
-                                    <span class="text-muted small">None</span>
-                                {% endif %}
-                            </td>
-                            <td class="fw-bold text-info">{{ record.title }}</td>
-                            <td>{{ record.created_at|date:"M d, Y H:i" }}</td>
-                            <td class="text-end">
-                                <a href="{% url 'record_detail' record.id %}" class="btn btn-sm btn-outline-secondary">View</a>
-                                <a href="{% url 'record_edit' record.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="{% url 'record_delete' record.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-4">No content items found. Click "+ Add New Item" to start.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="card bg-dark border-secondary p-4 shadow-sm mb-4">
+    <h5 class="text-light">Using your media</h5>
+    <ul class="text-secondary small mb-0">
+        <li><strong class="text-light">Pick it in a slot.</strong> Site-wide has the logo, Home has the full-screen background, and About, Services, Careers and Contact each have an optional banner. Open the page in the tabs above and choose from the dropdown.</li>
+        <li><strong class="text-light">Place it inside text.</strong> Type the item's shortcode, such as <code>[media:12]</code>, in an About or intro paragraph, a division description or a FAQ answer, and the image appears right there.</li>
+        <li><strong class="text-light">Attach it to a division.</strong> Each About division can show one image, chosen when you edit the division.</li>
+        <li><strong class="text-light">Gallery.</strong> Items with "Show in gallery" ticked appear in the About page gallery. Untick it for logos and backgrounds.</li>
+    </ul>
+</div>
+
+<div class="card bg-dark border-secondary p-4 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-dark table-striped table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Shortcode</th>
+                    <th>Gallery</th>
+                    <th>Added</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td class="text-secondary">#{{ record.pk }}</td>
+                    <td>
+                        {% if record.image %}
+                            <img src="{{ record.image.url }}" alt="" class="img-thumbnail bg-secondary border-0" style="width: 56px; height: 56px; object-fit: cover;">
+                        {% else %}
+                            <span class="text-muted small">None</span>
+                        {% endif %}
+                    </td>
+                    <td class="fw-bold text-info">{{ record.title }}</td>
+                    <td>
+                        {% if record.image %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" data-copy="[media:{{ record.pk }}]" title="Copy shortcode">[media:{{ record.pk }}]</button>
+                        {% else %}<span class="text-muted small">needs an image</span>{% endif %}
+                    </td>
+                    <td>{% if record.show_in_gallery %}<span class="badge text-bg-success">Shown</span>{% else %}<span class="badge text-bg-secondary">Hidden</span>{% endif %}</td>
+                    <td class="text-nowrap">{{ record.created_at|date:"M d, Y" }}</td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'record_detail' record.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                        <a href="{% url 'record_edit' record.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a href="{% url 'record_delete' record.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">Nothing here yet. Click "+ Add media" to upload your first image.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
+
+<script>
+document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-copy]');
+    if (!btn) return;
+    var text = btn.getAttribute('data-copy'), original = btn.textContent;
+    function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = original; }, 1200); }
+    if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done, done); } else { done(); }
+});
+</script>
 {% endblock %}

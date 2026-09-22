@@ -1,0 +1,22 @@
+<ul class="nav nav-pills flex-wrap gap-1 mb-4 pb-3 border-bottom border-secondary">
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'overview' %}active{% endif %}" href="{% url 'dashboard' %}">Overview</a>
+    </li>
+    {% for p in pages %}
+    <li class="nav-item">
+        <a class="nav-link {% if active == p.slug %}active{% endif %}" href="{% url 'page_edit' p.slug %}">{{ p.label }}</a>
+    </li>
+    {% endfor %}
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'records' %}active{% endif %}" href="{% url 'record_list' %}">Media library</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'applications' %}active{% endif %}" href="{% url 'applications' %}">Applications{% if unhandled_applications %} <span class="badge text-bg-info ms-1">{{ unhandled_applications }}</span>{% endif %}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active == 'inbox' %}active{% endif %}" href="{% url 'inbox' %}">Messages{% if unhandled %} <span class="badge text-bg-info ms-1">{{ unhandled }}</span>{% endif %}</a>
+    </li>
+    <li class="nav-item ms-auto">
+        <a class="nav-link" href="{% url 'home' %}" target="_blank" rel="noopener">View site &#8599;</a>
+    </li>
+</ul>

@@ -1,117 +1,82 @@
 {% extends 'base.html' %}
+{% load content_tags %}
 
-{% block title %}Home | ZuriKO Technologies{% endblock %}
-{% block nav_home %}active-node{% endblock %}
-{% block nav_home_icon %}={% endblock %}
+{% block title %}ZuriKO Technologies | Your IT & Media Partner for Innovation{% endblock %}
+{% block body_class %}is-home{% endblock %}
+{% block main_class %}hero-main{% endblock %}
 
 {% block content %}
-<style>
-    .hero-wrapper {
-        position: relative;
-        min-height: calc(100vh - 80px);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 2rem;
-        overflow: hidden;
-    }
-
-    /* Ambient Glow Core */
-    .hero-glow {
-        position: absolute;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, rgba(93, 0, 255, 0.08) 40%, transparent 70%);
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: -1;
-        pointer-events: none;
-        animation: pulseGlow 8s ease-in-out infinite alternate;
-    }
-    @keyframes pulseGlow {
-        0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
-        100% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-    }
-
-    /* Scanline effect */
-    .scanline {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.3));
-        background-size: 100% 4px;
-        pointer-events: none;
-        z-index: 1;
-        opacity: 0.6;
-    }
-
-    .hero-title-main {
-        font-size: clamp(3rem, 7vw, 6.5rem);
-        font-weight: 900;
-        letter-spacing: -3px;
-        line-height: 1;
-        margin-bottom: 1.5rem;
-        color: #fff;
-    }
-
-    .hero-title-gradient {
-        background: var(--brand-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .hero-subtitle {
-        font-family: monospace;
-        color: var(--tech-brand);
-        font-size: 1.1rem;
-        letter-spacing: 3px;
-        margin-bottom: 3rem;
-    }
-
-    /* Action triggers */
-    .btn-cyber {
-        background: transparent;
-        color: #fff;
-        font-family: monospace;
-        letter-spacing: 2px;
-        padding: 1rem 2.5rem;
-        border: 1px solid var(--tech-brand);
-        position: relative;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-    .btn-cyber:hover {
-        background: var(--tech-brand);
-        color: #000;
-        box-shadow: 0 0 25px var(--tech-brand);
-    }
-</style>
-
-<div class="hero-wrapper">
-    <div class="scanline"></div>
-    <div class="hero-glow"></div>
-
-    <div class="tech-label mb-3">Welcome to</div>
-    
-    <h1 class="hero-title-main">
-        ZuriKO Technologies <br>
-        <span class="hero-title-gradient"></span>
-    </h1>
-
-    <div class="hero-subtitle">
-        / YOUR IT & MEDIA PARTNER FOR INNOVATION
+{% page_media 'home' 'background' as bg %}
+{% page_lines 'home' 'hero_lines' as lines %}
+<section class="hero" aria-labelledby="hero-title">
+    {% if bg %}<img class="hero__bg" src="{{ bg }}" alt="" fetchpriority="high">{% endif %}
+    <div class="hero__scrim"></div>
+    <div class="container">
+        <h1 class="hero__title" id="hero-title">
+            <span class="hero__pre">{% page_text 'home' 'welcome_label' %}</span>
+            <span class="hero__name">{% page_text 'home' 'hero_title' %}</span>
+        </h1>
+        <p class="hero__sub">
+            <span class="visually-hidden">{{ lines.0 }}</span>
+            <span id="typed" aria-hidden="true">{{ lines.0 }}</span><span class="caret" aria-hidden="true"></span>
+        </p>
     </div>
+</section>
 
-<div class="d-flex gap-4">
-    <a href="{% url 'services' %}" class="btn-cyber">
-            [ EXPLORE OUR SERVICES ]
-        </a>
-        <a href="{% url 'contact' %}" class="btn-cyber" style="border-color: rgba(255,255,255,0.2);">
-            [ INITIATE COMMS ]
-        </a>
-    </div>
-</div>
+{% if sectors %}
+<section class="home-sectors container">
+    <div class="kicker">{% page_text 'home' 'strip_label' %}</div>
+    <ul class="sector-strip">
+        {% for sector in sectors %}<li><a href="{% url 'services' %}">{{ sector }}</a></li>{% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+{% if stats %}
+<section class="home-proof container">
+    <div class="kicker">{% page_text 'home' 'proof_label' %}</div>
+    <dl class="proof-grid">
+        {% for s in stats %}<div><dt>{{ s.value }}</dt><dd>{{ s.label }}</dd></div>{% endfor %}
+    </dl>
+</section>
+{% endif %}
+
+{{ lines|json_script:"hero-lines" }}
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* Typewriter subtitle: types a phrase, holds, deletes it, moves to the next. One phrase = types once and stays. */
+(function () {
+    var el = document.getElementById('typed');
+    var data = document.getElementById('hero-lines');
+    if (!el || !data) return;
+    var lines = [];
+    try { lines = JSON.parse(data.textContent) || []; } catch (e) {}
+    if (!lines.length) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = lines[0]; return; }
+
+    var TYPE = 55, ERASE = 26, HOLD = 1900, GAP = 380;
+    var i = 0, n = 0, erasing = false;
+    function tick() {
+        var text = lines[i];
+        if (!erasing) {
+            n++;
+            el.textContent = text.slice(0, n);
+            if (n >= text.length) {
+                if (lines.length === 1) return;
+                erasing = true;
+                return setTimeout(tick, HOLD);
+            }
+            return setTimeout(tick, TYPE + Math.random() * 45);
+        }
+        n--;
+        el.textContent = text.slice(0, n);
+        if (n <= 0) { erasing = false; i = (i + 1) % lines.length; return setTimeout(tick, GAP); }
+        setTimeout(tick, ERASE);
+    }
+    el.textContent = '';
+    setTimeout(tick, 400);
+})();
+</script>
 {% endblock %}

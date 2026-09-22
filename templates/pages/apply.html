@@ -1,37 +1,35 @@
 {% extends 'base.html' %}
 {% load content_tags %}
 
-{% block title %}Contact | ZuriKO Technologies{% endblock %}
+{% block title %}Apply: {{ job.title }} | ZuriKO Technologies{% endblock %}
 {% block main_class %}{% endblock %}
 
 {% block content %}
-{% page_media 'contact' 'banner' as banner %}
-{% page_text 'contact' 'intake_value' as intake_email %}
-{% page_text 'contact' 'popia_title' as popia_title %}
-{% page_text 'contact' 'popia_text' as popia_text %}
+{% page_media 'careers' 'banner' as banner %}
+{% page_text 'careers' 'apply_intro' as intro %}
+{% page_text 'careers' 'popia_title' as popia_title %}
+{% page_text 'careers' 'popia_text' as popia_text %}
 
 <section class="page-head{% if banner %} has-banner{% endif %}">
     {% if banner %}<img class="page-head__bg" src="{{ banner }}" alt="">{% endif %}
     <div class="container">
-        <h1 class="page-title">{% page_text 'contact' 'heading' %}</h1>
+        <div class="kicker">{% page_text 'careers' 'heading' %}</div>
+        <h1 class="page-title">Apply: {{ job.title }}</h1>
+        <div class="apply-summary">
+            <span class="tag">{{ job.department }}</span>
+            <span class="tag tag--ghost">{{ job.location }}</span>
+            <span class="tag tag--ghost">{{ job.level }}</span>
+        </div>
     </div>
 </section>
 
-<section class="container contact">
-    <div class="row g-5">
-        <div class="col-lg-5">
-            <h2 class="connect-h">{% page_text 'contact' 'connect_heading' %}</h2>
-            <p class="lede">{% page_text 'contact' 'connect_text' %}</p>
-            <ul class="info-list">
-                <li><span class="kicker">{% page_text 'contact' 'hub_label' %}</span><span class="value">{% page_text 'contact' 'hub_value' %}</span></li>
-                <li><span class="kicker">{% page_text 'contact' 'intake_label' %}</span><a href="mailto:{{ intake_email }}">{{ intake_email }}</a></li>
-                <li><span class="kicker">{% page_text 'contact' 'hours_label' %}</span><span class="value">{% page_text 'contact' 'hours_value' %}</span></li>
-            </ul>
-        </div>
-
-        <div class="col-lg-7">
+<section class="container apply">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
             <div class="form-panel">
-                <form method="post" action="{% url 'contact' %}" novalidate>
+                <p class="lede mb-4">{{ intro }}</p>
+
+                <form method="post" action="{% url 'apply' job.pk %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
 
@@ -48,15 +46,20 @@
                         {% for e in form.email.errors %}<div class="err">{{ e }}</div>{% endfor %}
                     </div>
                     <div class="field">
-                        <label for="id_phone">{% page_text 'contact' 'phone_label' %}</label>
-                        <input id="id_phone" name="phone" type="tel" maxlength="40" autocomplete="tel"
+                        <label for="id_phone">{% page_text 'contact' 'phone_label' %} <span class="req" aria-hidden="true">*</span></label>
+                        <input id="id_phone" name="phone" type="tel" required maxlength="40" autocomplete="tel"
                                placeholder="{% page_text 'contact' 'phone_placeholder' %}" value="{{ form.phone.value|default:'' }}">
                         {% for e in form.phone.errors %}<div class="err">{{ e }}</div>{% endfor %}
                     </div>
                     <div class="field">
-                        <label for="id_message">{% page_text 'contact' 'message_label' %} <span class="req" aria-hidden="true">*</span></label>
-                        <textarea id="id_message" name="message" required
-                                  placeholder="{% page_text 'contact' 'message_placeholder' %}">{{ form.message.value|default:'' }}</textarea>
+                        <label for="id_cv">Attach CV <span class="req" aria-hidden="true">*</span></label>
+                        <input id="id_cv" name="cv" type="file" required accept=".pdf,.doc,.docx">
+                        <div class="hint">PDF, DOC or DOCX, up to 5 MB.{% if form.errors %} Please choose your CV again.{% endif %}</div>
+                        {% for e in form.cv.errors %}<div class="err">{{ e }}</div>{% endfor %}
+                    </div>
+                    <div class="field">
+                        <label for="id_message">Cover Note / Summary</label>
+                        <textarea id="id_message" name="message" placeholder="Details...">{{ form.message.value|default:'' }}</textarea>
                         {% for e in form.message.errors %}<div class="err">{{ e }}</div>{% endfor %}
                     </div>
 
@@ -67,12 +70,12 @@
                     <div class="consent">
                         <input id="id_popia_consent" name="popia_consent" type="checkbox" required{% if form.popia_consent.value %} checked{% endif %}>
                         <div>
-                            <label for="id_popia_consent">{% page_text 'contact' 'consent_label' %} <a href="#agreement" data-open-agreement>{{ popia_title }}</a></label>
+                            <label for="id_popia_consent">{% page_text 'careers' 'consent_label' %} <a href="#agreement" data-open-agreement>{{ popia_title }}</a></label>
                             {% for e in form.popia_consent.errors %}<div class="err">{{ e }}</div>{% endfor %}
                         </div>
                     </div>
 
-                    <button class="btn-cta btn-send" type="submit">{% page_text 'contact' 'submit_button' %}</button>
+                    <button class="btn-cta btn-send" type="submit">{% page_text 'careers' 'apply_submit' %}</button>
                 </form>
             </div>
         </div>

@@ -1,0 +1,70 @@
+{% extends 'manage/manage_base.html' %}
+
+{% block manage_content %}
+<div class="mb-4">
+    <h2 class="text-light mb-1">Site content</h2>
+    <p class="text-secondary mb-0">Pick a page to change its wording and images. Lists such as services, job postings and FAQs are edited from the page they appear on.</p>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    {% for p in pages %}
+    <div class="col">
+        <div class="card bg-dark border-secondary h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+                <h4 class="card-title text-info">{{ p.label }}</h4>
+                <p class="text-secondary small mb-2">
+                    {{ p.text_edited }} of {{ p.text_total }} text blocks customised
+                </p>
+                {% if p.collections %}
+                <ul class="list-unstyled small mb-3">
+                    {% for c in p.collections %}
+                    <li class="text-light">{{ c.label_plural }}: <span class="text-secondary">{{ c.count }}</span></li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <div class="mt-auto d-flex gap-2">
+                    <a href="{% url 'page_edit' p.slug %}" class="btn btn-primary btn-sm">Edit content</a>
+                    <a href="{% url p.url_name %}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">View page &#8599;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="col">
+        <div class="card bg-dark border-secondary h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+                <h4 class="card-title text-info">Media library</h4>
+                <p class="text-secondary small mb-3">Images you can use as the logo, backgrounds, banners, division pictures or inside text: {{ record_count }}</p>
+                <div class="mt-auto">
+                    <a href="{% url 'record_list' %}" class="btn btn-primary btn-sm">Manage media</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card bg-dark border-secondary h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+                <h4 class="card-title text-info">Applications</h4>
+                <p class="text-secondary small mb-3">Job applications (with CVs) waiting to be reviewed: {{ unhandled_applications }}</p>
+                <div class="mt-auto">
+                    <a href="{% url 'applications' %}" class="btn btn-primary btn-sm">Open applications</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card bg-dark border-secondary h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+                <h4 class="card-title text-info">Messages</h4>
+                <p class="text-secondary small mb-3">Contact page enquiries waiting for a reply: {{ unhandled }}</p>
+                <div class="mt-auto">
+                    <a href="{% url 'inbox' %}" class="btn btn-primary btn-sm">Open inbox</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

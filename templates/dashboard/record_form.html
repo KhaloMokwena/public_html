@@ -1,17 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'manage/manage_base.html' %}
 {% load crispy_forms_tags %}
 
-{% block content %}
+{% block manage_content %}
 <div class="row justify-content-center mt-5">
     <div class="col-md-6">
         <div class="card bg-dark border-secondary p-4 shadow-sm">
-            <h3 class="text-light mb-3">{{ action }} Content Item</h3>
+            <h3 class="text-light mb-3">{{ action }} media</h3>
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {% crispy form %}
             </form>
             <div class="mt-3">
-                <a href="{% url 'dashboard' %}" class="text-muted text-decoration-none">&larr; Back to Management List</a>
+                <a href="{% url 'record_list' %}" class="text-muted text-decoration-none">&larr; Back to Media library</a>
             </div>
         </div>
     </div>

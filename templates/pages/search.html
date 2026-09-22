@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load content_tags %}
+
+{% block title %}Search | ZuriKO Technologies{% endblock %}
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <div class="kicker">Search</div>
+        <h1 class="page-title">{% if q %}Results for &ldquo;{{ q }}&rdquo;{% else %}Search the site{% endif %}</h1>
+        {% if q and not too_short %}
+            <p class="lede mt-3 mb-0">{{ results|length }} result{{ results|length|pluralize }} across the pages, services, careers, FAQs and media.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="container py-5">
+    {% if too_short %}
+        <p class="empty">Please type at least 2 characters.</p>
+    {% elif not q %}
+        <p class="empty">Use the search box in the menu to look through every page. Capital letters don&rsquo;t matter.</p>
+    {% elif not results %}
+        <p class="empty">Nothing matched &ldquo;{{ q }}&rdquo;. Try fewer or different words.</p>
+    {% else %}
+        <ul class="results">
+            {% for r in results %}
+            <li class="result">
+                <div class="result__meta">{{ r.kind }} &middot; {{ r.page }}</div>
+                <a class="result__title" href="{{ r.url }}">{{ r.title }}</a>
+                <p>{{ r.snippet }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'manage/manage_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block manage_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card bg-dark border-secondary p-4 shadow-sm">
+            <h3 class="text-light mb-3">{% if instance %}Edit{% else %}Add{% endif %} {{ collection.label|lower }}</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-success w-100 mt-2">Save</button>
+            </form>
+            <div class="mt-3">
+                <a href="{% url 'page_edit' collection.page %}" class="text-muted text-decoration-none">&larr; Back to {{ page.label }} page</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
